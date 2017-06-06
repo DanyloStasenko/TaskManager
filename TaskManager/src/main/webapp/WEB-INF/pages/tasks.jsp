@@ -27,146 +27,123 @@
 
 </head>
 <body>
-
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-2">
-
-                </div>
-                <div class="col-md-8">
-                    <div id = updating>
-                        <c:if test="${!empty tasks}">
-                            <h1>Tasks List:</h1>
-                            <table class="table">
-                                <thead>
-                                    <th width="80">ID</th>
-                                    <th width="180">Title</th>
-                                    <th width="180">User</th>
-                                    <%--<th width="180">Edit</th>
-                                    <th width="180">Delete</th>--%>
-                                </thead>
-                                <tbody>
-                                    <c:forEach items="${tasks}" var="task">
-                                        <tr>
-                                            <td>${task.id}</td>
-                                            <td>${task.title}</td>
-                                            <td>${task.recentlySharedTo}</td>
-                                            <%--<c:if test="${task.recentlySharedTo == pageContext.request.userPrincipal.name}">
-                                                <td><a href="<c:url value='/edit/${task.id}'/>">Edit</a></td>
-                                            </c:if>
-                                            <c:if test="${task.recentlySharedTo == pageContext.request.userPrincipal.name}">
-                                                <td><a href="<c:url value='/remove/${task.id}'/>">Delete</a></td>
-                                            </c:if>--%>
-                                            <%--<td><a href="<c:url value='/edit/${task.id}'/>">Edit</a></td>
-                                            <td><a href="<c:url value='/remove/${task.id}'/>">Delete</a></td>--%>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                        </c:if>
-
-                        <c:if test="${!empty managing}">
-                            <h1>Managing List:</h1>
-                            <table class="table">
-                                <thead>
-                                <th width="80">ID</th>
-                                <th width="180">Title</th>
-                                <th width="180">User</th>
-                                <th width="180">Edit</th>
-                                <th width="180">Delete</th>
-                                <th width="180">Share</th>
-                                </thead>
-                                <tbody>
-                                <c:forEach items="${managing}" var="task">
-                                    <tr>
-                                        <td>${task.id}</td>
-                                        <td>${task.title}</td>
-                                        <td>${task.recentlySharedTo}</td>
-                                        <%--<c:if test="${task.recentlySharedTo == pageContext.request.userPrincipal.name}">--%>
-                                            <td><a href="<c:url value='/edit/${task.id}'/>">Edit</a></td>
-                                        <%--</c:if>--%>
-                                        <%--<c:if test="${task.recentlySharedTo == pageContext.request.userPrincipal.name}">--%>
-                                            <td><a href="<c:url value='/remove/${task.id}'/>">Delete</a></td>
-                                       <%-- </c:if>--%>
-                                        <%--<c:if test="${task.recentlySharedTo == pageContext.request.userPrincipal.name}">--%>
-                                            <td><a href="<c:url value='/share/${task.id}'/>">Share</a></td>
-                                        <%--</c:if>--%>
-                                            <%--<td><a href="<c:url value='/edit/${task.id}'/>">Edit</a></td>
-                                            <td><a href="<c:url value='/remove/${task.id}'/>">Delete</a></td>--%>
-                                    </tr>
-                                </c:forEach>
-                                </tbody>
-                            </table>
-                        </c:if>
-
-                    </div>
-
-                    <c:url var="addAction" value="/tasks/add"/>
-                    <form:form action="${addAction}" commandName="task">
-                        <table>
-                            <c:if test="${!empty task.title}">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-8">
+            <div id = updating>
+                <c:if test="${!empty tasks}">
+                    <h1>Tasks List:</h1>
+                    <table class="table">
+                        <thead>
+                            <th width="80">ID</th>
+                            <th width="180">Title</th>
+                            <th width="180">Status</th>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${tasks}" var="task">
                                 <tr>
-                                    <td>
-                                        <form:label path="id">
-                                            <spring:message text="ID"/>
-                                        </form:label>
-                                    </td>
-                                    <td>
-                                        <form:input path="id" readonly="true" size="8" disabled="true"/>
-                                        <form:hidden path="id"/>
-                                    </td>
+                                    <td>${task.id}</td>
+                                    <td>${task.title}</td>
+                                    <td>${task.status}</td>
                                 </tr>
-                            </c:if>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
 
+                <c:if test="${!empty managing}">
+                    <h1>Managing List:</h1>
+                    <table class="table">
+                        <thead>
+                        <th width="80">ID</th>
+                        <th width="180">Title</th>
+                        <th width="180">Status</th>
+                        <th width="180">Edit</th>
+                        <th width="180">Delete</th>
+                        <th width="180">Share</th>
+                        </thead>
+                        <tbody>
+                        <c:forEach items="${managing}" var="task">
                             <tr>
-                                <td>
-                                    <form:label path="title">
-                                        <spring:message text="Title"/>
-                                    </form:label>
-                                </td>
-                                <td>
-                                    <form:input path="title"/>
-                                </td>
+                                <td>${task.id}</td>
+                                <td>${task.title}</td>
+                                <td>${task.status}</td>
+                                <td><a href="<c:url value='/edit/${task.id}'/>">Edit</a></td>
+                                <td><a href="<c:url value='/remove/${task.id}'/>">Delete</a></td>
+                                <td><a href="<c:url value='/share/${task.id}'/>">Share</a></td>
                             </tr>
-
-                            <tr>
-                                <td>
-                                    <form:label path="recentlySharedTo">
-                                        <spring:message text="CreatedBy"/>
-                                    </form:label>
-                                </td>
-                                <td>
-                                    <form:input path="recentlySharedTo"/>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td colspan="2">
-
-                                    <c:if test="${!empty task.title}">
-                                        <input type="submit"
-                                               value="<spring:message text="Edit Task"/>"/>
-                                    </c:if>
-
-                                    <c:if test="${empty task.title}">
-                                        <input type="submit"
-                                               value="<spring:message text="Add Task"/>"/>
-                                    </c:if>
-                                </td>
-                            </tr>
-                        </table>
-                    </form:form>
-                    <c:if test="${pageContext.request.userPrincipal.name != null}">
-                        <p> Welcome : ${pageContext.request.userPrincipal.name} | <a href="<c:url value="/j_spring_security_logout"/>">Logout</a></p>
-                    </c:if>
-                    <p>Copyright &copy; 2017 <a href="http://github.com/danylostasenko">Danylo Stasenko</a></p>
-                </div>
-                <div class="col-md-2">
-                </div>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
             </div>
 
-        </div>
+            <c:url var="addAction" value="/tasks/add"/>
+            <form:form action="${addAction}" commandName="task">
+                <table>
+                    <c:if test="${!empty task.title}">
+                        <tr>
+                            <td>
+                                <form:label path="id">
+                                    <spring:message text="ID"/>
+                                </form:label>
+                            </td>
+                            <td>
+                                <form:input path="id" readonly="true" size="8" disabled="true"/>
+                                <form:hidden path="id"/>
+                            </td>
+                        </tr>
+                    </c:if>
 
+                    <tr>
+                        <td>
+                            <form:label path="title">
+                                <spring:message text="Title"/>
+                            </form:label>
+                        </td>
+                        <td>
+                            <form:input path="title"/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <form:label path="status">
+                                <spring:message text="CreatedBy"/>
+                            </form:label>
+                        </td>
+                        <td>
+                            <form:input path="status"/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+
+                            <c:if test="${!empty task.title}">
+                                <input type="submit"
+                                       value="<spring:message text="Edit Task"/>"/>
+                            </c:if>
+
+                            <c:if test="${empty task.title}">
+                                <input type="submit"
+                                       value="<spring:message text="Add Task"/>"/>
+                            </c:if>
+                        </td>
+                    </tr>
+                </table>
+            </form:form>
+            <c:if test="${pageContext.request.userPrincipal.name != null}">
+                <p> Welcome : ${pageContext.request.userPrincipal.name} | <a href="<c:url value="/j_spring_security_logout"/>">Logout</a></p>
+            </c:if>
+            <p>Copyright &copy; 2017 <a href="http://github.com/danylostasenko">Danylo Stasenko</a></p>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+</div>
 
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>

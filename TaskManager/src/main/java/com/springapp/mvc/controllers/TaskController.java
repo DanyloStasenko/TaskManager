@@ -29,70 +29,90 @@ public class TaskController {
     @Qualifier(value = "userService")
     private UserService userService;
 
-
+    /** Changing task 'status' to 'shared with [username]'
+     * and sharing this task with user
+     * ('sharing' means making task available to manage) */
     @RequestMapping("/tasks/share")
     public String shareWith(@ModelAttribute("task") Task task){
 
-        String shareWith = task.getRecentlySharedTo();
-        task.setRecentlySharedTo("Shared with " + shareWith);
+        User manager = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final String name = manager.getUsername();
 
+        // Updating
+        String shareWith = task.getStatus();
+        task.setStatus("Shared with " + shareWith + " by " + name);
         taskService.updateTask(task);
-        com.springapp.mvc.models.User user = userService.getUserByName(shareWith);
 
+        // Sharing
+        com.springapp.mvc.models.User user = userService.getUserByName(shareWith);
         user.getTasks().add(task);
         userService.updateUser(user);
 
         return "redirect:/tasks";
     }
 
-
+    /** Getting 'username' to share with */
     @RequestMapping("/share/{id}")
     public String shareTask(@PathVariable("id") int id, Model model){
-
         model.addAttribute("task", taskService.getTaskById(id));
-
         return "share";
     }
 
+    /** Implementation of adding and editing tasks */
     @RequestMapping(value = "/tasks/add", method = RequestMethod.POST)
     public String addTask(@ModelAttribute("task") Task task){
 
+        // Getting user who created this task
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final String name = user.getUsername();
+        com.springapp.mvc.models.User taskCreator = userService.getUserByName(user.getUsername());
 
+        // Adding task
         if (task.getId() == 0){
-            com.springapp.mvc.models.User manager = userService.getUserByName(name);
             taskService.addTask(task);
 
-            manager.getTasks().add(task);
-            userService.updateUser(manager);
+            // making this task available to manage for user
+            taskCreator.getTasks().add(task);
+            userService.updateUser(taskCreator);
         }
 
+        // Updating task
         else {
-            com.springapp.mvc.models.User manager = userService.getUserByName(name);
-            task.addManager(manager);
             taskService.updateTask(task);
         }
 
         return "redirect:/tasks";
     }
 
+    /** Implementation of removing task by id */
     @RequestMapping("/remove/{id}")
     public String removeTask(@PathVariable("id") int id){
 
+        // Getting user who is trying to remove this task
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final String name = user.getUsername();
+        com.springapp.mvc.models.User manager = userService.getUserByName(user.getUsername());
 
+        // Task must be shared with this user, otherwise user shouldn't remove this task
         Task task = taskService.getTaskById(id);
-        com.springapp.mvc.models.User manager = userService.getUserByName(name);
-        manager.getTasks().remove(task);
+        if (manager.getTasks().contains(task)){
 
-        userService.updateUser(manager);
+            // Deleting this task from all users
+            List<com.springapp.mvc.models.User> users = userService.getUsersList();
+            for (com.springapp.mvc.models.User currentUser : users) {
+                if (currentUser.getTasks().contains(task)){
+                    currentUser.getTasks().remove(task);
+                    userService.updateUser(currentUser);
+                }
+            }
+        }
+
+        // Removing task after it is unplugged to other users
         taskService.removeTaskById(id);
 
         return "redirect:/tasks";
     }
 
+    /** Getting page to edit the task.
+     * This page looks like main page but user is editing task, instead of adding */
     @RequestMapping("edit/{id}")
     public String editTask(@PathVariable("id") int id, Model model){
 
@@ -114,6 +134,8 @@ public class TaskController {
         return "tasks";
     }
 
+    /** Getting page to manage the tasks.
+     * By default, user can create new tasks from this page */
     @RequestMapping(value = "/tasks", method = RequestMethod.GET)
 	public String getAllTasks(ModelMap model) {
 

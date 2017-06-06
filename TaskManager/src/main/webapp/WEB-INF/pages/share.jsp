@@ -26,18 +26,18 @@
                 </form:label>
             </td>
             <td>
-                <form:input path="title"/>
+                <form:input path="title" readonly="true" />
             </td>
         </tr>
 
         <tr>
             <td>
-                <form:label path="recentlySharedTo">
-                    <spring:message text="CreatedBy"/>
+                <form:label path="status">
+                    <spring:message text="Share with: "/>
                 </form:label>
             </td>
             <td>
-                <form:input path="recentlySharedTo"/>
+                <form:input path="status"/>
             </td>
         </tr>
 
@@ -46,13 +46,9 @@
 
                 <c:if test="${!empty task.title}">
                     <input type="submit"
-                           value="<spring:message text="Edit Task"/>"/>
+                           value="<spring:message text="Share"/>"/>
                 </c:if>
 
-                <c:if test="${empty task.title}">
-                    <input type="submit"
-                           value="<spring:message text="Add Task"/>"/>
-                </c:if>
             </td>
         </tr>
     </table>

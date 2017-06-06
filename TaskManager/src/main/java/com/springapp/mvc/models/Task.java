@@ -16,21 +16,17 @@ public class Task {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "created_by")
-    private String recentlySharedTo;
+    @Column(name = "status")
+    private String status;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "tasks")
     private Set<User> users = new HashSet<User>();
 
-    public Task(String title) {
-        this.title = title;
-    }
-
     public Task() {
     }
 
-    public void addManager(User manager){
-        users.add(manager);
+    public Task(String title) {
+        this.title = title;
     }
 
     public Set<User> getUsers() {
@@ -57,12 +53,12 @@ public class Task {
         this.title = title;
     }
 
-    public String getRecentlySharedTo() {
-        return recentlySharedTo;
+    public String getStatus() {
+        return status;
     }
 
-    public void setRecentlySharedTo(String recentlySharedTo) {
-        this.recentlySharedTo = recentlySharedTo;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
@@ -87,7 +83,7 @@ public class Task {
         return "Task{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", recentlySharedTo='" + recentlySharedTo + '\'' +
+                ", status='" + status + '\'' +
                   ", users=" + users +
                 '}';
     }

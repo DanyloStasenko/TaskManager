@@ -28,18 +28,10 @@ public class TaskService{
     }
 
     public Task getTaskById(int id) {
-        return taskDao.getTaskById(id);
+      return taskDao.getTaskById(id);
     }
 
-    public List<Task> getTasksList() {
-        List<Task> list = taskDao.getTasksList();
-        return list;
+    public List<Task> getTasksList() {return taskDao.getTasksList();
     }
-
-    public void merge(Task task){
-        taskDao.merge(task);
-    }
-
-
 }
 

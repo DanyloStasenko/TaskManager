@@ -21,13 +21,10 @@ public class User implements UserDetails{
     @Column(name="password", length=64)
     private String password;
 
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_task", joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name ="task_id")})
     private Set<Task> tasks = new HashSet<Task>();
-
-
 
 
     public User() {
@@ -63,7 +60,6 @@ public class User implements UserDetails{
     }
 
 
-
     @Override
     public List<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
@@ -96,7 +92,6 @@ public class User implements UserDetails{
         return "User{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                // ", tasks=" + tasks +
                 '}';
     }
 
