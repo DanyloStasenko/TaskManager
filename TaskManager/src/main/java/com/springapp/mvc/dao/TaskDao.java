@@ -28,11 +28,6 @@ public class TaskDao{
         logger.info(task + " updated");
     }
 
-    public void merge(Task task){
-        getSession().merge(task);
-        logger.info(task + " merged");
-    }
-
     public void removeById(int id){
         Session session = this.sessionFactory.getCurrentSession();
         Task task = (Task) session.load(Task.class, new Integer(id));
@@ -51,19 +46,9 @@ public class TaskDao{
 
     @SuppressWarnings("unchecked")
     public List<Task> getTasksList(){
-        /*Session session = sessionFactory.openSession();
-        List<Task> tasksList = session.createQuery("from Task").list();
-
-        for(Task task : tasksList)
-        {
-            logger.info("Domain list: " + task);
-        }
-
-        return tasksList;*/
-
-        logger.info("Getting list of tasks");
         Criteria criteria = getSession().createCriteria(Task.class);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        logger.info("Getting list of tasks");
         return criteria.list();
     }
 

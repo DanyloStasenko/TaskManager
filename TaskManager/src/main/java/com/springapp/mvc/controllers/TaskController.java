@@ -1,12 +1,13 @@
 package com.springapp.mvc.controllers;
 
 import com.springapp.mvc.models.Task;
+import com.springapp.mvc.models.User;
 import com.springapp.mvc.services.TaskService;
 import com.springapp.mvc.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -29,48 +30,89 @@ public class TaskController {
     @Qualifier(value = "userService")
     private UserService userService;
 
-    /** Changing task 'status' to 'shared with [username]'
-     * and sharing this task with user
-     * ('sharing' means making task available to manage) */
+
+    /**
+     * Redirecting user to registration-page
+     */
+    @RequestMapping("/register")
+    public String register(Model model){
+        model.addAttribute("user", new com.springapp.mvc.models.User());
+        return "register";
+    }
+
+
+    /**
+     * Adding new user if username and password are not empty. Available for unauthorized users.
+     */
+    @RequestMapping(value = "/register/adduser", method = RequestMethod.POST)
+    public String registerUser(@ModelAttribute("user") com.springapp.mvc.models.User user){
+
+        if (!user.getUsername().isEmpty() && !user.getPassword().isEmpty()){
+            userService.addUser(new com.springapp.mvc.models.User(user.getUsername(), user.getPassword()));
+        }
+        return "redirect:/tasks";
+    }
+
+
+    /**
+     *  Getting [username] to share with and continue sharing
+     */
+    @RequestMapping("/share/{id}")
+    public String shareTask(@PathVariable("id") int id, Model model){
+
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        User manager = userService.getUserByName(loggedInUser.getName());
+
+        // checking whether the user has the rights to share this task
+        if (!taskService.getTaskById(id).getUsers().contains(manager)){
+            return "redirect:/tasks";
+        }
+
+        model.addAttribute("task", taskService.getTaskById(id));
+        return "share";
+    }
+
+
+    /**
+     *  Sharing this task with user.
+     * 'Sharing' means making task available to manage.
+     *  and changing task's status to 'shared with [username]'
+     */
     @RequestMapping("/tasks/share")
     public String shareWith(@ModelAttribute("task") Task task){
 
-        User manager = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final String name = manager.getUsername();
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        User manager = userService.getUserByName(loggedInUser.getName());
 
-        // Updating
+        // Changing status
         String shareWith = task.getStatus();
-        task.setStatus("Shared with " + shareWith + " by " + name);
+        task.setStatus("Shared with " + shareWith + " by " + manager.getUsername());
         taskService.updateTask(task);
 
-        // Sharing
-        com.springapp.mvc.models.User user = userService.getUserByName(shareWith);
+        // Making available to manage
+        User user = userService.getUserByName(shareWith);
         user.getTasks().add(task);
         userService.updateUser(user);
 
         return "redirect:/tasks";
     }
 
-    /** Getting 'username' to share with */
-    @RequestMapping("/share/{id}")
-    public String shareTask(@PathVariable("id") int id, Model model){
-        model.addAttribute("task", taskService.getTaskById(id));
-        return "share";
-    }
 
-    /** Implementation of adding and editing tasks */
+    /**
+     *  Implementation of adding and editing tasks
+     */
     @RequestMapping(value = "/tasks/add", method = RequestMethod.POST)
     public String addTask(@ModelAttribute("task") Task task){
 
-        // Getting user who created this task
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        com.springapp.mvc.models.User taskCreator = userService.getUserByName(user.getUsername());
+        // Getting user who's created this task
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        User taskCreator = userService.getUserByName(loggedInUser.getName());
 
         // Adding task
         if (task.getId() == 0){
             taskService.addTask(task);
 
-            // making this task available to manage for user
+            // making this task available to manage for it's creator
             taskCreator.getTasks().add(task);
             userService.updateUser(taskCreator);
         }
@@ -83,78 +125,92 @@ public class TaskController {
         return "redirect:/tasks";
     }
 
-    /** Implementation of removing task by id */
+
+    /**
+     *  Implementation of removing tasks by ID
+     */
     @RequestMapping("/remove/{id}")
     public String removeTask(@PathVariable("id") int id){
 
-        // Getting user who is trying to remove this task
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        com.springapp.mvc.models.User manager = userService.getUserByName(user.getUsername());
+        // Getting user who's trying to remove this task
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        User manager = userService.getUserByName(loggedInUser.getName());
 
         // Task must be shared with this user, otherwise user shouldn't remove this task
-        Task task = taskService.getTaskById(id);
-        if (manager.getTasks().contains(task)){
+        if (taskService.getTaskById(id).getUsers().contains(manager)) {
 
-            // Deleting this task from all users
+            Task task = taskService.getTaskById(id);
+
+            // Unplugging this task from all users in database
             List<com.springapp.mvc.models.User> users = userService.getUsersList();
             for (com.springapp.mvc.models.User currentUser : users) {
-                if (currentUser.getTasks().contains(task)){
+                if (currentUser.getTasks().contains(task)) {
                     currentUser.getTasks().remove(task);
                     userService.updateUser(currentUser);
                 }
             }
-        }
 
-        // Removing task after it is unplugged to other users
-        taskService.removeTaskById(id);
+            // Removing the task is available only after it's unplugged from other users
+            taskService.removeTaskById(id);
+        }
 
         return "redirect:/tasks";
     }
 
-    /** Getting page to edit the task.
-     * This page looks like main page but user is editing task, instead of adding */
+
+    /**
+     *  Creating page to edit the task.
+     *  This page is the same as 'tasks', but here's the form to edit task instead of create new one
+     */
     @RequestMapping("edit/{id}")
     public String editTask(@PathVariable("id") int id, Model model){
 
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final String name = user.getUsername();
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        User manager = userService.getUserByName(loggedInUser.getName());
 
-        com.springapp.mvc.models.User manager = userService.getUserByName(name);
-
+        // Removing available to manage tasks from 'allTasks' to avoid duplicated tasks on the page
         List<Task> allTasks = taskService.getTasksList();
-        List<Task> availableToManage = taskService.getTasksList();
-
         allTasks.removeIf(task -> task.getUsers().contains(manager));
+
+        // Removing not available to manage tasks from 'availableToManage' list
+        List<Task> availableToManage = taskService.getTasksList();
         availableToManage.removeIf(task -> !task.getUsers().contains(manager));
 
+        model.addAttribute("tasks", allTasks);
+        model.addAttribute("managing", availableToManage);
         model.addAttribute("task", this.taskService.getTaskById(id));
+
+        return "tasks";
+    }
+
+
+    /**
+     *  Getting page with all tasks.
+     *
+     *  Here are 2 lists, depends from user:
+     *   - List with not available to manage tasks
+     *   - List with available to manage tasks
+     *
+     *  User can also create new tasks from this page
+     */
+    @RequestMapping(value = "/tasks", method = RequestMethod.GET)
+	public String getAllTasks(ModelMap model) {
+
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        User manager = userService.getUserByName(loggedInUser.getName());
+
+        // Removing available to manage tasks from 'allTasks' to avoid duplicated tasks on the page
+        List<Task> allTasks = taskService.getTasksList();
+        allTasks.removeIf(task -> task.getUsers().contains(manager));
+
+        // Removing not available to manage tasks from 'availableToManage' list
+        List<Task> availableToManage = taskService.getTasksList();
+        availableToManage.removeIf(task -> !task.getUsers().contains(manager));
+
+        model.addAttribute("task", new Task());
         model.addAttribute("tasks", allTasks);
         model.addAttribute("managing", availableToManage);
 
         return "tasks";
     }
-
-    /** Getting page to manage the tasks.
-     * By default, user can create new tasks from this page */
-    @RequestMapping(value = "/tasks", method = RequestMethod.GET)
-	public String getAllTasks(ModelMap model) {
-
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final String name = user.getUsername();
-
-        com.springapp.mvc.models.User manager = userService.getUserByName(name);
-
-        List<Task> nonManageTasks = taskService.getTasksList();
-        List<Task> availableToManage = taskService.getTasksList();
-
-        nonManageTasks.removeIf(task -> task.getUsers().contains(manager));
-        availableToManage.removeIf(task -> !task.getUsers().contains(manager));
-
-        model.addAttribute("task", new Task());
-        model.addAttribute("tasks", nonManageTasks);
-        model.addAttribute("managing", availableToManage);
-
-        return "tasks";
-    }
-
 }

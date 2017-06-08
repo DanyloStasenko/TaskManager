@@ -1,1 +1,4 @@
-<% response.sendRedirect("/tasks.html");  %>
+<head>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<% response.sendRedirect("/tasks");  %>

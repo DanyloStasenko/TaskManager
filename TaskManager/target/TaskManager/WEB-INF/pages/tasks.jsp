@@ -11,9 +11,10 @@
 
     <title>Tasks</title>
 
-    <meta name="description" content="Source code generated using layoutit.com">
-    <meta name="author" content="LayoutIt!">
+    <meta name="description" content="This is task page">
+    <meta name="author" content="Danylo Stasenko">
 
+    <link rel="shortcut icon" href="../favicon.ico"/>
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/stylet.css" rel="stylesheet">
 
@@ -111,7 +112,7 @@
                     <tr>
                         <td>
                             <form:label path="status">
-                                <spring:message text="CreatedBy"/>
+                                <spring:message text="Status"/>
                             </form:label>
                         </td>
                         <td>
@@ -135,6 +136,7 @@
                     </tr>
                 </table>
             </form:form>
+            <br>
             <c:if test="${pageContext.request.userPrincipal.name != null}">
                 <p> Welcome : ${pageContext.request.userPrincipal.name} | <a href="<c:url value="/j_spring_security_logout"/>">Logout</a></p>
             </c:if>

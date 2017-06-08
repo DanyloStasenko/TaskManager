@@ -29,18 +29,6 @@ public class UserDao {
         logger.info(user + " updated");
     }
 
-    public void removeUserById(int id){
-        Session session = getSession();
-        User user = (User) session.load(User.class, new Integer(id));
-        if (user != null){
-            session.delete(user);
-            logger.info(user + " removed");
-        }
-        else {
-            logger.info("Can't remove user. User is null");
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public User getUserById(int id){
         logger.info("Getting model by id: " + id);
