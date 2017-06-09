@@ -36,7 +36,7 @@ public class TaskController {
      */
     @RequestMapping("/register")
     public String register(Model model){
-        model.addAttribute("user", new com.springapp.mvc.models.User());
+        model.addAttribute("user", new User());
         return "register";
     }
 
@@ -45,10 +45,10 @@ public class TaskController {
      * Adding new user if username and password are not empty. Available for unauthorized users.
      */
     @RequestMapping(value = "/register/adduser", method = RequestMethod.POST)
-    public String registerUser(@ModelAttribute("user") com.springapp.mvc.models.User user){
+    public String registerUser(@ModelAttribute("user") User user){
 
         if (!user.getUsername().isEmpty() && !user.getPassword().isEmpty()){
-            userService.addUser(new com.springapp.mvc.models.User(user.getUsername(), user.getPassword()));
+            userService.addUser(new User(user.getUsername(), user.getPassword(), user.getEmail()));
         }
         return "redirect:/tasks";
     }
@@ -142,8 +142,8 @@ public class TaskController {
             Task task = taskService.getTaskById(id);
 
             // Unplugging this task from all users in database
-            List<com.springapp.mvc.models.User> users = userService.getUsersList();
-            for (com.springapp.mvc.models.User currentUser : users) {
+            List<User> users = userService.getUsersList();
+            for (User currentUser : users) {
                 if (currentUser.getTasks().contains(task)) {
                     currentUser.getTasks().remove(task);
                     userService.updateUser(currentUser);

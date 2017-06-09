@@ -35,6 +35,16 @@
             </td>
         </tr>
         <tr>
+            <td>
+                <form:label path="email">
+                    <spring:message text="Email "/>
+                </form:label>
+            </td>
+            <td>
+                <form:input path="email"/>
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <c:if test="${empty user.username}">
                     <input type="submit"
