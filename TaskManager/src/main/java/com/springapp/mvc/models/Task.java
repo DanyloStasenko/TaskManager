@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
-public class Task {
+public class Task extends Model{
 
     @Id
     @Column(name = "id")
@@ -20,21 +20,13 @@ public class Task {
     private String status;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "tasks")
-    private Set<User> users = new HashSet<User>();
+    private Set<User> managers = new HashSet<User>();
 
     public Task() {
     }
 
     public Task(String title) {
         this.title = title;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
     }
 
     public int getId() {
@@ -61,6 +53,14 @@ public class Task {
         this.status = status;
     }
 
+    public Set<User> getManagers() {
+        return managers;
+    }
+
+    public void setManagers(Set<User> managers) {
+        this.managers = managers;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,7 +84,7 @@ public class Task {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", status='" + status + '\'' +
-                  ", users=" + users +
+                  ", managers=" + managers +
                 '}';
     }
 }
