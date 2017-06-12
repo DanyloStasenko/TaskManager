@@ -34,6 +34,36 @@
         <div class="col-md-2">
         </div>
         <div class="col-md-8">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                    </button>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="/tasks">Tasks</a>
+                        </li>
+                        <li>
+                            <a href="/users">Users</a>
+                        </li>
+                    </ul>
+
+                    <c:if test="${pageContext.request.userPrincipal.name != null}">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="<c:url value="/j_spring_security_logout"/>">Logout (${pageContext.request.userPrincipal.name})</a>
+                            </li>
+                        </ul>
+                    </c:if>
+
+                </div>
+
+            </nav>
+
             <div id = updating>
                 <c:if test="${!empty tasks}">
                     <h1>Tasks List:</h1>
@@ -137,11 +167,7 @@
                     </tr>
                 </table>
             </form:form>
-            <br>
-            <c:if test="${pageContext.request.userPrincipal.name != null}">
-                <p> Welcome : ${pageContext.request.userPrincipal.name} | <a href="<c:url value="/j_spring_security_logout"/>">Logout</a></p>
-            </c:if>
-            <p>Copyright &copy; 2017 <a href="http://github.com/danylostasenko">Danylo Stasenko</a></p>
+
         </div>
         <div class="col-md-2">
         </div>
