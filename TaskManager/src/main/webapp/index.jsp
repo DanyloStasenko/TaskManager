@@ -2,4 +2,4 @@
 <head>
     <link rel="shortcut icon" href="favicon.ico"/>
 </head>
-<% response.sendRedirect("/tasks");  %>
+<% response.sendRedirect("/users");  %>

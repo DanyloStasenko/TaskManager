@@ -30,6 +30,7 @@
 </head>
 <body>
 <div class="container-fluid">
+
     <div class="row">
         <div class="col-md-2">
         </div>
@@ -59,10 +60,9 @@
                             </li>
                         </ul>
                     </c:if>
-
                 </div>
-
             </nav>
+
 
             <div id = updating>
                 <c:if test="${!empty tasks}">
@@ -91,10 +91,10 @@
                         <thead>
                         <th width="80">ID</th>
                         <th width="180">Title</th>
-                        <th width="180">Status</th>
-                        <th width="180">Edit</th>
-                        <th width="180">Delete</th>
-                        <th width="180">Share</th>
+                        <th width="400">Status</th>
+                        <th width="120">Edit</th>
+                        <th width="120">Delete</th>
+                        <th width="120">Share</th>
                         </thead>
                         <tbody>
                         <c:forEach items="${managing}" var="task">
@@ -111,65 +111,79 @@
                     </table>
                 </c:if>
             </div>
+        </div>
+        <div class="col-md-2">
+        </div>
 
-            <c:url var="addAction" value="/tasks/add"/>
-            <form:form action="${addAction}" commandName="task">
-                <table>
-                    <c:if test="${!empty task.title}">
-                        <tr>
-                            <td>
-                                <form:label path="id">
-                                    <spring:message text="ID"/>
-                                </form:label>
-                            </td>
-                            <td>
-                                <form:input path="id" readonly="true" size="8" disabled="true"/>
-                                <form:hidden path="id"/>
-                            </td>
-                        </tr>
-                    </c:if>
 
-                    <tr>
-                        <td>
-                            <form:label path="title">
-                                <spring:message text="Title"/>
-                            </form:label>
-                        </td>
-                        <td>
-                            <form:input path="title"/>
-                        </td>
-                    </tr>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-2">
 
-                    <tr>
-                        <td>
-                            <form:label path="status">
-                                <spring:message text="Status"/>
-                            </form:label>
-                        </td>
-                        <td>
-                            <form:input path="status"/>
-                        </td>
-                    </tr>
+                    </div>
 
-                    <tr>
-                        <td colspan="2">
+                    <div class="col-md-4">
+
+                        <c:url var="addAction" value="/tasks/add"/>
+                        <form:form cssClass="form-horizontal" role="form" action="${addAction}" commandName="task">
+
+                            <c:if test="${empty task.title}">
+                                <h4>Add task:</h4>
+                            </c:if>
 
                             <c:if test="${!empty task.title}">
-                                <input type="submit"
-                                       value="<spring:message text="Edit Task"/>"/>
+                                <h4>Edit task:</h4>
+                                <div class="form-group">
+                                    <form:label cssClass="col-sm-2 control-label" for="inputEmail3" path="id">
+                                        ID
+                                    </form:label>
+                                    <form:input path="id" readonly="true" size="8" disabled="true"/>
+                                    <form:hidden path="id"/>
+                                </div>
+                            </c:if>
+
+                            <div class="form-group">
+                                <form:label cssClass="col-sm-2 control-label" for="text" path="title">
+                                    Title
+                                </form:label>
+                                <form:input path="title"/>
+                            </div>
+
+                            <div class="form-group">
+                                <form:label cssClass="col-sm-2 control-label" for="text" path="status">
+                                    Status
+                                </form:label>
+                                <form:input path="status"/>
+                            </div>
+
+
+                            <c:if test="${!empty task.title}">
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="submit" class="btn btn-default" value="">
+                                            Edit Task
+                                        </button>
+                                    </div>
+                                </div>
                             </c:if>
 
                             <c:if test="${empty task.title}">
-                                <input type="submit"
-                                       value="<spring:message text="Add Task"/>"/>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="submit" class="btn btn-default" value="">
+                                            Add Task
+                                        </button>
+                                    </div>
+                                </div>
                             </c:if>
-                        </td>
-                    </tr>
-                </table>
-            </form:form>
 
-        </div>
-        <div class="col-md-2">
+                        </form:form>
+                    </div>
+                    <div class="col-md-6">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

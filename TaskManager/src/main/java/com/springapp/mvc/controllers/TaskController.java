@@ -32,6 +32,15 @@ public class TaskController {
     private UserService userService;
 
     /**
+     * Creating page for users
+     */
+    @RequestMapping("/users")
+    public String users(Model model){
+        model.addAttribute("users", userService.getUsersList());
+        return "users";
+    }
+
+    /**
      * Creating page for sharing
      */
     @RequestMapping("/share/{id}")
